@@ -1,1 +1,1 @@
-# php-amqp-worker
+# PHP AMQP Worker

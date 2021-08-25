@@ -1,0 +1,40 @@
+{
+    "name": "quetzal-studio/php-amqp-worker",
+    "description": "PHP worker with AMQP",
+    "keywords": [
+        "php",
+        "amqp",
+        "worker",
+        "php-worker",
+        "rabbitmq",
+        "queue",
+        "message"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ata",
+            "email": "quetzalskeith@gmail.com"
+        }
+    ],
+    "require": {
+        "monolog/monolog": "^2.2",
+        "nesbot/carbon": "^2.31",
+        "php-amqplib/php-amqplib": "^3.0",
+        "vlucas/phpdotenv": "^5.3"
+    },
+    "autoload": {
+        "files": [
+            "src/helpers.php"
+        ],
+        "psr-4": {
+            "QuetzalStudio\\PhpAmqpWorker\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
