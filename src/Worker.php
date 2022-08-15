@@ -2,14 +2,13 @@
 
 namespace QuetzalStudio\PhpAmqpWorker;
 
-use App\Worker\Contracts\WithLogger;
 use Carbon\Carbon;
 use Exception;
-use InvalidArgumentException;
 use PhpAmqpLib\Connection\AMQPLazyConnection;
 use PhpAmqpLib\Exchange\AMQPExchangeType;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
+use Psr\Log\LoggerInterface;
 use QuetzalStudio\PhpAmqpWorker\Log\Logger;
 
 abstract class Worker
@@ -116,7 +115,7 @@ abstract class Worker
      *
      * @return void
      */
-    public function registerConfig()
+    public function registerConfig(): void
     {
         if (class_exists(\Illuminate\Foundation\Application::class)) {
             $this->config = config("workers.{$this->name()}");
@@ -348,11 +347,11 @@ abstract class Worker
     public function declareExchange()
     {
         $this->channel()->exchange_declare(
-            $this->exchange(),
-            AMQPExchangeType::DIRECT,
-            $passive = false,
-            $durable = true,
-            $autoDelete = false
+            $this->exchange(), // exchange
+            AMQPExchangeType::DIRECT, // type
+            false, // passive
+            true, // durable
+            false // autoDelete
         );
 
         return $this;
@@ -366,13 +365,13 @@ abstract class Worker
     public function declareQueue()
     {
         $this->channel()->queue_declare(
-            $this->queue(),
-            $passive = false,
-            $durable = true,
-            $exclusive = false,
-            $autoDelete = false,
-            $nowait = false,
-            $arguments = new AMQPTable([])
+            $this->queue(), // queue
+            false, // passive
+            true, // durable
+            false, // exclusive
+            false, // autoDelete
+            false, // nowait
+            new AMQPTable([]) // arguments
         );
 
         return $this;
@@ -406,18 +405,18 @@ abstract class Worker
     {
         $this->channel()->basic_consume(
             $this->queue(),
-            $consumerTag = '',
-            $noLocal = false,
-            $noAck = $this->config('no_ack'),
-            $exclusive = false,
-            $nowait = false,
-            $callback = function ($message) {
+            '', // consumerTag
+            false, // noLocal
+            $this->config('no_ack'), // noAck
+            false, // exclusive
+            false, // nowait
+            function ($message) {
                 try {
                     $this->consumeMessage($message);
                 } catch (Exception $e) {
                     $this->consumeMessageException($message, $e);
                 }
-            }
+            } // callback
         );
 
         while ($this->channel()->is_consuming()) {
